@@ -1,62 +1,145 @@
-import os
+menu = """\n
+#########MENU##########
+[n]\tNova Conta
+[l]\tListar contas
 
-menu = """
-1 - Depositar
-2 - Sacar
-3 - Extrato
-4 - Sair
+[d]\tDepositar
+[s]\tSacar
+[sa]\tSaldo
+[e]\tExtrato
+
+[q]\tSair
+
+#######################
 """
 
-conta_bancaria = {
-    "Saldo": 0,
-    "Extrato": [],
-    "numero_saques": 0
-}
+lista_contas = [0]
+
+bd = [
+
+]
+
+class Conta:
+    def __init__(self, nome):
+
+        self.numero = lista_contas[-1] + 1
+        self.nome = nome
+        self.saldo = 0
+        self.qtd_saque = 0
+        self.extrato = []
+
+        lista_contas.append(self.numero)
+    def  depositar(self, valor):
+        self.saldo += valor
+        self.extrato.append({"deposito": valor})
+        print("Deposito realizado com sucesso!")
+        return True
+
+    def sacar(self, valor):
+        if self.qtd_saque > 3:
+            print("Operação falhou! Número máximo de saques excedido.")
+            return False
+        
+        if self.saldo >= valor:
+            self.saldo -= valor
+            self.extrato.append({"saque": valor})
+            self.qtd_saque += 1
+            print("Saque realizado com sucesso!")
+            return True
+        
+        else:
+            print("Operação falhou! Saldo insuficiente.")
+            return False
 
 
-def depositar(valor):
-    conta_bancaria["Saldo"] += valor
-    conta_bancaria["Extrato"].append(f"Deposito de {valor}")
-    print("Deposito realizado com sucesso")
+    def ler_extrato(self):
+        print("Extrato:")
+        if self.ler_extrato == []:
+            print("Sem movimentações")
+            return False
+        
+        for extrato in self.extrato:
+            print(extrato)
+        return True
     
 
-def sacar(valor):
-    if conta_bancaria["numero_saques"] > 3:
-        print("Limite de saques excedido")
-        return
+    def ler_saldo(self):
+        print(str(self.saldo))
+        return True
+
     
-    if conta_bancaria["Saldo"] - valor > 0:
-        conta_bancaria["Saldo"] -= valor
-        conta_bancaria["Extrato"].append(f"Saque de {valor}")
-        conta_bancaria["numero_saques"] += 1
-        print("Saque realizado com sucesso")
-        return 
+    
 
-    print("Saldo insuficiente")
-def extrato():
-    print(f"Saldo: {conta_bancaria['Saldo']}")
-    print("Extrato:")
-    for movimentacao in conta_bancaria["Extrato"]:
-        print(movimentacao)
+saldo = 0
+limite = 500
+extrato = ""
+numero_saques = 0
+LIMITE_SAQUES = 3
 
-os.system("clear")
+
 while True:
-    print("#"*25,"BANCO","#"*25)
+
     opcao = input(menu)
-    print("#"*25,"#####","#"*25)
 
-    if opcao == "1":
-        valor = float(input("Quanto deseja depositar? "))
-        depositar(valor)
-    elif opcao == "2":
-        valor = float(input("Quanto deseja sacar? "))
-        sacar(valor)
-    elif opcao == "3":
-        extrato()
-    elif opcao == "4":
+
+    if opcao == "n":
+        print("Criando uma nova conta...")
+        nome = input("Infome o nome do cliente: ")
+        conta = Conta(nome)
+        bd.append(conta)
+        print(f"Conta criada com sucesso!\nNumero da conta: {conta.numero}\nNome do cliente: {conta.nome}")
+
+
+    if opcao == "l":
+        print(bd)
+        print("Listando contas...")
+        for conta in lista_contas:
+            print(conta)
+
+    if opcao == "d":
+        numero = input("Infome o numero da conta: ")
+
+        for conta in bd:
+            if conta.numero == int(numero):
+                conta.depositar(int(input("Infome o valor a ser depositado: ")))
+
+            else:
+                print("Conta inexistente!")
+
+    elif opcao == "s":
+        numero = int(input("Infome o numero da conta: "))
+        
+        for conta in bd:
+            if int(conta.numero) == int(numero):
+                valor = int(input("Infome o valor a ser sacado: "))
+                conta.sacar(valor)
+
+            else:
+                print("Conta inexistente!")
+
+    elif opcao == "sa":
+        numero = input("Infome o numero da conta: ")
+        
+        for conta in bd:
+            if int(conta.numero) == int(numero):
+                conta.ler_saldo()
+
+            else:
+                print("Conta inexistente!")
+
+
+    elif opcao == "e":
+        numero = input("Infome o numero da conta: ")
+        
+        for conta in bd:
+            if conta.numero == int(numero):
+                conta.ler_extrato()
+
+            else:
+                print("Conta inexistente!")
+
+    elif opcao == "q":
         break
-    else:
-        print("Opção inválida")
 
-    input("Pressione qualquer tecla para continuar...")
-    os.system("clear")
+    else:
+        print("Operação inválida, por favor selecione novamente a operação desejada.")
